@@ -106,7 +106,8 @@ public class FilterableArray<T: Equatable> {
 
 extension ArrayDiffer {
     
-    private typealias LCSMatrix = Array<Array<Int>>
+    private typealias IndexType = Int
+    private typealias LCSMatrix = Array<Array<IndexType>>
     
     /// @return LCS matrix
     private class func LCSLength(x xlist: [T], y ylist: [T]) -> LCSMatrix {
@@ -149,7 +150,7 @@ extension ArrayDiffer {
     
     /// @return a mapped list of [x] - [y]
     /// precondition: y is a subset of x
-    private class func LCSSubtract<U>(x xlist: [T], y ylist: [T], mapFunc: Int -> U) -> [U] {
+    private class func LCSSubtract<U>(x xlist: [T], y ylist: [T], mapFunc: IndexType -> U) -> [U] {
         let xlen = countElements(xlist)
         let ylen = countElements(ylist)
         
@@ -165,7 +166,7 @@ extension ArrayDiffer {
         return indexList
     }
     
-    private class func LCSDiff<U>(#oldValue: [T], newValue: [T], mapFunc: Int -> U) -> ArrayDiff<U> {
+    private class func LCSDiff<U>(#oldValue: [T], newValue: [T], mapFunc: IndexType -> U) -> ArrayDiff<U> {
         let matrix = LCSLength(x: oldValue, y: newValue)
         let unchanged = LCSBacktrack(matrix: matrix, x: oldValue, y: newValue)
         
