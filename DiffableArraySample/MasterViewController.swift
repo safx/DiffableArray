@@ -31,22 +31,13 @@ class MasterViewController: UITableViewController, UISearchBarDelegate {
             self.detailViewController = controllers[controllers.count-1].topViewController as? DetailViewController
         }
 
-        let tableView = self.tableView
-        var diffSink = SinkOf<ArrayDiffer<State>>({ [weak tableView] diff in
+        weak var tableView = self.tableView
+        var diffSink = SinkOf<ArrayDiffer<State>>({ diff in
             dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)) {
-                if let t = tableView {
-                    let d = diff.diffAsIndexPath()
-                    let cnt = max(countElements(diff.oldValue), countElements(diff.newValue))
-                    let change = countElements(d.added) + countElements(d.removed) + countElements(d.modified);
-                    
-                    if change == 0 ||
-                        change >= cnt ||
-                        countElements(diff.newValue) != countElements(diff.oldValue) + countElements(d.added) - countElements(d.removed) {
-                            dispatch_async(dispatch_get_main_queue()) {
-                            t.reloadData()
-                        }
-                    } else {
-                        dispatch_async(dispatch_get_main_queue()) {
+                let d = diff.diffAsIndexPath()
+                if countElements(d.added) + countElements(d.removed) + countElements(d.modified) > 0 {
+                    dispatch_async(dispatch_get_main_queue()) {
+                        if let t = tableView {
                             t.beginUpdates()
                             t.insertRowsAtIndexPaths(d.added   , withRowAnimation: .Left)
                             t.deleteRowsAtIndexPaths(d.removed , withRowAnimation: .Right)
@@ -57,7 +48,7 @@ class MasterViewController: UITableViewController, UISearchBarDelegate {
                 }
             }
         })
-        
+
         // http://simple.wikipedia.org/wiki/List_of_U.S._states
         states = FilterableArray(diffSink: diffSink, initialValue: [
             State(name: "Alabama"        , abbreviation: "AL", capital: "Montgomery"     , becameDate: "December 14, 1819"),

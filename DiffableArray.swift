@@ -28,7 +28,11 @@ public class ArrayDiffer<T: Equatable>{
         return ArrayDiffer.LCSDiff(oldValue: oldValue, newValue: newValue) { $0 }
     }
     public func diffAsIndexPath() -> ArrayDiff<NSIndexPath> {
-        return ArrayDiffer.LCSDiff(oldValue: oldValue, newValue: newValue) { NSIndexPath(forRow: $0, inSection: 0)! }
+        #if os(iOS)
+            return ArrayDiffer.LCSDiff(oldValue: oldValue, newValue: newValue) { NSIndexPath(forRow: $0, inSection: 0) }
+        #else
+            return ArrayDiffer.LCSDiff(oldValue: oldValue, newValue: newValue) { NSIndexPath(index: $0) }
+        #endif
     }
 }
 
