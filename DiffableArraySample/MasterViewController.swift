@@ -26,16 +26,16 @@ class MasterViewController: UITableViewController, UISearchBarDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        if let split = self.splitViewController {
+        /*if let split = self.splitViewController {
             let controllers = split.viewControllers
             self.detailViewController = controllers[controllers.count-1].topViewController as? DetailViewController
-        }
+        }*/
 
         weak var tableView = self.tableView
-        var diffSink = SinkOf<ArrayDiffer<State>>({ diff in
+        let diffSink = SinkOf<ArrayDiffer<State>> { diff in
             dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)) {
                 let d = diff.diffAsIndexPath()
-                if countElements(d.added) + countElements(d.removed) + countElements(d.modified) > 0 {
+                if d.added.count + d.removed.count + d.modified.count > 0 {
                     dispatch_async(dispatch_get_main_queue()) {
                         if let t = tableView {
                             t.beginUpdates()
@@ -47,7 +47,7 @@ class MasterViewController: UITableViewController, UISearchBarDelegate {
                     }
                 }
             }
-        })
+        }
 
         // http://simple.wikipedia.org/wiki/List_of_U.S._states
         states = FilterableArray(diffSink: diffSink, initialValue: [
@@ -113,8 +113,8 @@ class MasterViewController: UITableViewController, UISearchBarDelegate {
 
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "showDetail" {
-            if let indexPath = self.tableView.indexPathForSelectedRow() {
-                let controller = (segue.destinationViewController as UINavigationController).topViewController as DetailViewController
+            if let indexPath = self.tableView.indexPathForSelectedRow {
+                let controller = (segue.destinationViewController as! UINavigationController).topViewController as! DetailViewController
                 controller.detailItem = states![indexPath.row]
                 controller.navigationItem.leftBarButtonItem = self.splitViewController?.displayModeButtonItem()
                 controller.navigationItem.leftItemsSupplementBackButton = true

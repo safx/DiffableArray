@@ -171,6 +171,8 @@
 		8D8CAB801A60110E008BE290 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftMigration = 0700;
+				LastSwiftUpdateCheck = 0700;
 				LastUpgradeCheck = 0610;
 				ORGANIZATIONNAME = "Safx Developers";
 				TargetAttributes = {
@@ -425,6 +427,7 @@
 				8D8CABAB1A60110E008BE290 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		8D8CABAC1A60110E008BE290 /* Build configuration list for PBXNativeTarget "DiffableArrayTests" */ = {
 			isa = XCConfigurationList;
@@ -433,6 +436,7 @@
 				8D8CABAE1A60110E008BE290 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

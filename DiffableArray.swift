@@ -36,8 +36,20 @@ public class ArrayDiffer<T: Equatable>{
     }
 }
 
+public struct SinkOf<T> {
+    let sink: T -> ()
+
+    public init(_ sink: T -> ()) {
+        self.sink = sink
+    }
+
+    public func put(value: T) {
+        sink(value)
+    }
+}
+
 public class DiffableArray<T: Equatable> {
-    typealias SinkOfDiffer = SinkOf<ArrayDiffer<T>>
+    public typealias SinkOfDiffer = SinkOf<ArrayDiffer<T>>
     
     private var _value: [T]
     private var _diffSink: SinkOfDiffer
@@ -115,8 +127,8 @@ extension ArrayDiffer {
     
     /// @return LCS matrix
     private class func LCSLength(x xlist: [T], y ylist: [T]) -> LCSMatrix {
-        let xlen = countElements(xlist) + 1
-        let ylen = countElements(ylist) + 1
+        let xlen = xlist.count + 1
+        let ylen = ylist.count + 1
         
         var m = Array(count: xlen, repeatedValue:Array(count:ylen, repeatedValue:0))
         for x in 1..<xlen {
@@ -134,8 +146,8 @@ extension ArrayDiffer {
     /// @return array of unchanged elements
     private class func LCSBacktrack(matrix m: LCSMatrix, x xlist:[T], y ylist:[T]) -> [T] {
         var a = [T]()
-        var x = countElements(xlist)
-        var y = countElements(ylist)
+        var x = xlist.count
+        var y = ylist.count
         while y >= 1 && x >= 1 {
             if xlist[x-1] == ylist[y-1] {
                 a.append(xlist[x-1])
@@ -149,14 +161,14 @@ extension ArrayDiffer {
                 }
             }
         }
-        return a.reverse()
+        return Array(a.reverse())
     }
     
     /// @return a mapped list of [x] - [y]
     /// precondition: y is a subset of x
     private class func LCSSubtract<U>(x xlist: [T], y ylist: [T], mapFunc: IndexType -> U) -> [U] {
-        let xlen = countElements(xlist)
-        let ylen = countElements(ylist)
+        let xlen = xlist.count
+        let ylen = ylist.count
         
         var indexList = [U]()
         var y = 0
@@ -170,7 +182,7 @@ extension ArrayDiffer {
         return indexList
     }
     
-    private class func LCSDiff<U>(#oldValue: [T], newValue: [T], mapFunc: IndexType -> U) -> ArrayDiff<U> {
+    private class func LCSDiff<U>(oldValue oldValue: [T], newValue: [T], mapFunc: IndexType -> U) -> ArrayDiff<U> {
         let matrix = LCSLength(x: oldValue, y: newValue)
         let unchanged = LCSBacktrack(matrix: matrix, x: oldValue, y: newValue)
         
