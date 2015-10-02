@@ -32,25 +32,9 @@ class MasterViewController: UITableViewController, UISearchBarDelegate {
         }*/
 
         weak var tableView = self.tableView
-        let diffSink = SinkOf<ArrayDiffer<State>> { diff in
-            dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)) {
-                let d = diff.diffAsIndexPath()
-                if d.added.count + d.removed.count + d.modified.count > 0 {
-                    dispatch_async(dispatch_get_main_queue()) {
-                        if let t = tableView {
-                            t.beginUpdates()
-                            t.insertRowsAtIndexPaths(d.added   , withRowAnimation: .Left)
-                            t.deleteRowsAtIndexPaths(d.removed , withRowAnimation: .Right)
-                            t.reloadRowsAtIndexPaths(d.modified, withRowAnimation: .Left)
-                            t.endUpdates()
-                        }
-                    }
-                }
-            }
-        }
 
         // http://simple.wikipedia.org/wiki/List_of_U.S._states
-        states = FilterableArray(diffSink: diffSink, initialValue: [
+        states = FilterableArray(initialValue: [
             State(name: "Alabama"        , abbreviation: "AL", capital: "Montgomery"     , becameDate: "December 14, 1819"),
             State(name: "Alaska"         , abbreviation: "AK", capital: "Juneau"         , becameDate: "January 3, 1959"),
             State(name: "Arizona"        , abbreviation: "AZ", capital: "Phoenix"        , becameDate: "February 14, 1912"),
@@ -101,7 +85,20 @@ class MasterViewController: UITableViewController, UISearchBarDelegate {
             State(name: "West Virginia"  , abbreviation: "WV", capital: "Charleston"     , becameDate: "June 20, 1863"),
             State(name: "Wisconsin"      , abbreviation: "WI", capital: "Madison"        , becameDate: "May 29, 1848"),
             State(name: "Wyoming"        , abbreviation: "WY", capital: "Cheyenne"       , becameDate: "July 10, 1890"),
-        ])
+        ]) { diff in
+            dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)) {
+                let d = diff.diffAsIndexPath()
+                if let t = tableView where d.added.count + d.removed.count + d.modified.count > 0 {
+                    dispatch_async(dispatch_get_main_queue()) {
+                        t.beginUpdates()
+                        t.insertRowsAtIndexPaths(d.added   , withRowAnimation: .Left)
+                        t.deleteRowsAtIndexPaths(d.removed , withRowAnimation: .Right)
+                        t.reloadRowsAtIndexPaths(d.modified, withRowAnimation: .Left)
+                        t.endUpdates()
+                    }
+                }
+            }
+        }
     }
 
     override func didReceiveMemoryWarning() {

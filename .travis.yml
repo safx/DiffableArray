@@ -1,15 +1,11 @@
 language: objective-c
 osx_image: xcode7
 
-before_install:
-- gem install nokogiri -- --with-xml2-include=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk/usr/include/libxml2 --use-system-libraries
-- bundle install
-
 script:
 - set -o pipefail
 - xcodebuild -project DiffableArray.xcodeproj -scheme DiffableArray test -sdk iphonesimulator9.0 -destination "platform=iOS Simulator,name=iPhone 6" | xcpretty -c
 - pod lib lint --quick
 
 after_success:
-- bundle exec slather coverage --input-format profdata --cobertura-xml --ignore "../**/*/Xcode*" --output-directory coverage --scheme DiffableArray DiffableArray.xcodeproj
+- bundle exec slather coverage --input-format profdata --cobertura-xml --output-directory coverage --scheme DiffableArray DiffableArray.xcodeproj
 - bash <(curl -s https://codecov.io/bash)

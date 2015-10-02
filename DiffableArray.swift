@@ -36,28 +36,16 @@ public class ArrayDiffer<T: Equatable>{
     }
 }
 
-public struct SinkOf<T> {
-    let sink: T -> ()
-
-    public init(_ sink: T -> ()) {
-        self.sink = sink
-    }
-
-    public func put(value: T) {
-        sink(value)
-    }
-}
-
 public class DiffableArray<T: Equatable> {
-    public typealias SinkOfDiffer = SinkOf<ArrayDiffer<T>>
+    public typealias ChangeHandler = ArrayDiffer<T> -> ()
     
     private var _value: [T]
-    private var _diffSink: SinkOfDiffer
+    private let changeHandler: ChangeHandler
     
     public var value: [T] {
         get { return self._value }
         set {
-            _diffSink.put(ArrayDiffer(oldValue: self._value, newValue: newValue))
+            changeHandler(ArrayDiffer(oldValue: self._value, newValue: newValue))
             self._value = newValue
         }
     }
@@ -70,9 +58,9 @@ public class DiffableArray<T: Equatable> {
         return _value[index]
     }
     
-    public init(diffSink: SinkOfDiffer, initialValue: [T] = []) {
+    public init(initialValue: [T] = [], changeHandler: ChangeHandler) {
+        self.changeHandler = changeHandler
         _value = initialValue
-        _diffSink = diffSink
     }
 }
 
@@ -102,9 +90,9 @@ public class FilterableArray<T: Equatable> {
         return _filteredData[index]
     }
     
-    public init(diffSink: DiffableArray<T>.SinkOfDiffer, initialValue: [T] = []) {
+    public init(initialValue: [T] = [], changeHandler: DiffableArray<T>.ChangeHandler) {
+        _filteredData = DiffableArray(initialValue: initialValue, changeHandler: changeHandler)
         value = initialValue
-        _filteredData = DiffableArray(diffSink: diffSink, initialValue: initialValue)
     }
     
     private func updateFilteredData() {
