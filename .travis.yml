@@ -1,11 +1,10 @@
 language: objective-c
-osx_image: xcode7
+osx_image: xcode7.1
 
 script:
 - set -o pipefail
-- xcodebuild -project DiffableArray.xcodeproj -scheme DiffableArray test -sdk iphonesimulator9.0 -destination "platform=iOS Simulator,name=iPhone 6" | xcpretty -c
+- xcodebuild -project DiffableArray.xcodeproj -scheme DiffableArray test -sdk iphonesimulator9.1 -destination "platform=iOS Simulator,name=iPhone 6" | xcpretty -c
 - pod lib lint --quick
 
 after_success:
-- bundle exec slather coverage --input-format profdata --cobertura-xml --output-directory coverage --scheme DiffableArray DiffableArray.xcodeproj
 - bash <(curl -s https://codecov.io/bash)
