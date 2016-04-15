@@ -145,12 +145,14 @@ class MasterViewController: UITableViewController, UISearchBarDelegate {
         states!.filterFunction = createFilterFunc(searchText)
     }
 
-    func createFilterFunc(word: String)(s: State) -> Bool {
-        if (word == "") {
-            return true
+    func createFilterFunc(word: String) -> State -> Bool {
+        return { (s: State) -> Bool in
+            if (word == "") {
+                return true
+            }
+            return s.name.lowercaseString.rangeOfString(word.lowercaseString) != nil
+                || s.abbreviation.lowercaseString.rangeOfString(word.lowercaseString) != nil
         }
-        return s.name.lowercaseString.rangeOfString(word.lowercaseString) != nil
-            || s.abbreviation.lowercaseString.rangeOfString(word.lowercaseString) != nil
     }
 }
 

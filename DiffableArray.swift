@@ -139,13 +139,13 @@ extension ArrayDiffer {
         while y >= 1 && x >= 1 {
             if xlist[x-1] == ylist[y-1] {
                 a.append(xlist[x-1])
-                --x
-                --y
+                x -= 1
+                y -= 1
             } else {
                 if m[x][y-1] > m[x-1][y] {
-                    --y
+                    y -= 1
                 } else {
-                    --x
+                    x -= 1
                 }
             }
         }
@@ -162,7 +162,7 @@ extension ArrayDiffer {
         var y = 0
         for x in 0..<xlen {
             if y < ylen && xlist[x] == ylist[y] {
-                ++y
+                y += 1
             } else {
                 indexList.append(mapFunc(x))
             }
