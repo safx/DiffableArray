@@ -39,28 +39,25 @@ public class ArrayDiffer<T: Equatable>{
 public class DiffableArray<T: Equatable> {
     public typealias ChangeHandler = ArrayDiffer<T> -> ()
     
-    private var _value: [T]
     private let changeHandler: ChangeHandler
     
     public var value: [T] {
-        get { return self._value }
-        set {
-            changeHandler(ArrayDiffer(oldValue: self._value, newValue: newValue))
-            self._value = newValue
+        willSet {
+            changeHandler(ArrayDiffer(oldValue: self.value, newValue: newValue))
         }
     }
     
     public var count: Int {
-        return _value.count
+        return value.count
     }
     
     public subscript(index: Int) -> T {
-        return _value[index]
+        return value[index]
     }
     
     public init(initialValue: [T] = [], changeHandler: ChangeHandler) {
         self.changeHandler = changeHandler
-        _value = initialValue
+        value = initialValue
     }
 }
 
@@ -96,11 +93,7 @@ public class FilterableArray<T: Equatable> {
     }
     
     private func updateFilteredData() {
-        if let f = filterFunction {
-            _filteredData.value = value.filter(f)
-        } else {
-            _filteredData.value = value
-        }
+        _filteredData.value = filterFunction.map{value.filter($0)} ?? value
     }
 }
 
@@ -149,7 +142,7 @@ extension ArrayDiffer {
                 }
             }
         }
-        return Array(a.reverse())
+        return a.reverse()
     }
     
     /// @return a mapped list of [x] - [y]
